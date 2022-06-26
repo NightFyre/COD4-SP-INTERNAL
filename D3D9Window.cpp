@@ -483,8 +483,6 @@ namespace COD4_SP {
 
 		vecscreen.x = (windowWidth / 2 * NDC.x) + (NDC.x + windowWidth / 2);
 		vecscreen.y = -(windowHeight / 2 * NDC.y) + (NDC.y + windowHeight / 2);
-
-		//converttorange(vecscreen);
 		return true;
 	}
 }

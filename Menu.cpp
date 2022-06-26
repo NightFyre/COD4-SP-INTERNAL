@@ -2,6 +2,7 @@
 float vMatrix[16];
 
 namespace COD4_SP {
+	void Draw3DBox(Vector3 Pos, float* Matrix, int Width, int Height, ImColor color, int Thickness);
 	namespace TABS {
 		void Main() {
 			ImGui::Text("PLAYER");
@@ -260,8 +261,8 @@ namespace COD4_SP {
 
 			ImGui::GetBackgroundDrawList()->AddLine(drawPosition, ImVec2(screen.x, screen.y), cLines, 1);
 			ImGui::GetBackgroundDrawList()->AddText(ImVec2(screen.x, screen.y), cText, HP.c_str());
-			ImGui::GetBackgroundDrawList()->AddRect(ImVec2(screen.x + center, screen.y), ImVec2(screen.x - center, head.y), cLines);
-			
+			Draw3DBox(g_GameData->EntObject->FeetPosition, vMatrix, X, Y, cLines, 1);
+			//ImGui::GetBackgroundDrawList()->AddRect(ImVec2(screen.x + center, screen.y), ImVec2(screen.x - center, head.y), cLines);
 			if (m_dbg_healthbars) {
 				//float Width = 100;
 				//float Height = 10;
@@ -277,5 +278,57 @@ namespace COD4_SP {
 				//ImGui::GetBackgroundDrawList()->PopClipRect();
 			}
 		}
+	}
+
+	void Draw3DBox(Vector3 Pos, float* Matrix, int Width, int Height, ImColor color, int Thickness) {
+
+		//	BOX TOP DIMENSIONS
+		Vector3 top_front_left = Vector3{ Pos.x + 10, Pos.y - 10, Pos.z + 55 };
+		ImVec2 top_front_left_2D;
+		Vector3 top_front_right = Vector3{ Pos.x + 10, Pos.y + 10, Pos.z + 55 };
+		ImVec2 top_front_right_2D;
+		Vector3 top_bottom_left = Vector3{ Pos.x - 10, Pos.y + 10, Pos.z + 55 };
+		ImVec2 top_bottom_left_2D;
+		Vector3 top_bottom_right = Vector3{ Pos.x - 10, Pos.y - 10, Pos.z + 55 };
+		ImVec2 top_bottom_right_2D;
+		
+		//	Get World To Screen Position for Top Half of Box
+		g_D3D9Window->WorldToScreen(top_front_left, (Vector2&)top_front_left_2D, Matrix, Width, Height);
+		g_D3D9Window->WorldToScreen(top_front_right, (Vector2&)top_front_right_2D, Matrix, Width, Height);
+		g_D3D9Window->WorldToScreen(top_bottom_left, (Vector2&)top_bottom_left_2D, Matrix, Width, Height);
+		g_D3D9Window->WorldToScreen(top_bottom_right, (Vector2&)top_bottom_right_2D, Matrix, Width, Height);
+
+		//	BOX BOTTOM DIMENSIONS
+		Vector3 bottom_front_left = Vector3{ Pos.x + 10, Pos.y - 10, Pos.z };
+		ImVec2 bottom_front_left_2D;
+		Vector3 bottom_front_right = Vector3{ Pos.x + 10, Pos.y + 10, Pos.z };
+		ImVec2 bottom_front_right_2D;
+		Vector3 bottom_rear_left = Vector3{ Pos.x - 10, Pos.y + 10, Pos.z };
+		ImVec2 bottom_rear_left_2D;
+		Vector3 bottom_rear_right = Vector3{ Pos.x - 10, Pos.y - 10, Pos.z };
+		ImVec2 bottom_rear_right_2D;
+
+		//	Get World To Screen Position for Lower Half of Box
+		g_D3D9Window->WorldToScreen(bottom_front_left, (Vector2&)bottom_front_left_2D, Matrix, Width, Height);
+		g_D3D9Window->WorldToScreen(bottom_front_right, (Vector2&)bottom_front_right_2D, Matrix, Width, Height);
+		g_D3D9Window->WorldToScreen(bottom_rear_left, (Vector2&)bottom_rear_left_2D, Matrix, Width, Height);
+		g_D3D9Window->WorldToScreen(bottom_rear_right, (Vector2&)bottom_rear_right_2D, Matrix, Width, Height);
+
+
+		//	DRAW 3D BOXES
+		ImGui::GetBackgroundDrawList()->AddLine(top_bottom_left_2D, top_front_right_2D, color, Thickness);
+		ImGui::GetBackgroundDrawList()->AddLine(top_front_left_2D, top_front_right_2D, color, Thickness);
+		ImGui::GetBackgroundDrawList()->AddLine(top_front_left_2D, top_bottom_right_2D, color, Thickness);
+		ImGui::GetBackgroundDrawList()->AddLine(top_bottom_left_2D, top_bottom_right_2D, color, Thickness);
+
+		ImGui::GetBackgroundDrawList()->AddLine(bottom_rear_left_2D, bottom_front_right_2D, color, Thickness);
+		ImGui::GetBackgroundDrawList()->AddLine(bottom_front_right_2D, bottom_front_left_2D, color, Thickness);
+		ImGui::GetBackgroundDrawList()->AddLine(bottom_front_left_2D, bottom_rear_right_2D, color, Thickness);
+		ImGui::GetBackgroundDrawList()->AddLine(bottom_rear_right_2D, bottom_rear_left_2D, color, Thickness);
+
+		ImGui::GetBackgroundDrawList()->AddLine(bottom_rear_right_2D, top_bottom_right_2D, color, Thickness);
+		ImGui::GetBackgroundDrawList()->AddLine(bottom_rear_left_2D, top_bottom_left_2D, color, Thickness);
+		ImGui::GetBackgroundDrawList()->AddLine(bottom_front_right_2D, top_front_right_2D, color, Thickness);
+		ImGui::GetBackgroundDrawList()->AddLine(bottom_front_left_2D, top_front_left_2D, color, Thickness);
 	}
 }
